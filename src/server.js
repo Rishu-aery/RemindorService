@@ -1,9 +1,11 @@
 const express = require("express");
-const { PORT } = require("./config/serverConfig.js");
+const { PORT, REMINDER_BINDING_KEY } = require("./config/serverConfig.js");
 const { setupJobs } = require("./utils/jobs.js");
 const apiRoutes = require("./routes/index.js");
 
-const setupAndStartServer = () => {
+const { createChannel, subscribeMessage } = require("./utils/messageQueue.js");
+
+const setupAndStartServer = async () => {
     const app = express();
 
     app.use(express.urlencoded({extended: true}));
@@ -11,10 +13,13 @@ const setupAndStartServer = () => {
 
     app.use("/api", apiRoutes);
 
+    const channel = await createChannel();
+    subscribeMessage(channel, undefined, REMINDER_BINDING_KEY);
+
     app.listen(PORT, () => {
         console.log(`Server Running At PORT:${PORT}`);
     });
-    setupJobs();
+    // setupJobs();
 }
 
 setupAndStartServer();
