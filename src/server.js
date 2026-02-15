@@ -4,6 +4,7 @@ const { setupJobs } = require("./utils/jobs.js");
 const apiRoutes = require("./routes/index.js");
 
 const { createChannel, subscribeMessage } = require("./utils/messageQueue.js");
+const { subscribeEvents } = require("./services/emailService.js");
 
 const setupAndStartServer = async () => {
     const app = express();
@@ -14,7 +15,7 @@ const setupAndStartServer = async () => {
     app.use("/api", apiRoutes);
 
     const channel = await createChannel();
-    subscribeMessage(channel, undefined, REMINDER_BINDING_KEY);
+    subscribeMessage(channel, subscribeEvents, REMINDER_BINDING_KEY);
 
     app.listen(PORT, () => {
         console.log(`Server Running At PORT:${PORT}`);
